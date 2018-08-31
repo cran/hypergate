@@ -1,5 +1,5 @@
 ## ----global_options, include=FALSE---------------------------------------
-knitr::opts_chunk$set(fig.pos = 'H',tidy.opts=list(width.cutoff=60),tidy=TRUE)
+knitr::opts_chunk$set(fig.pos = 'H',tidy.opts=list(width.cutoff=60),tidy=TRUE,fig.path="fig/")
 
 ## ---- include=FALSE------------------------------------------------------
 options("warn"=-1)
@@ -119,4 +119,28 @@ plot_gating_strategy(
 	level=1,
 	highlight="firebrick3"
 )
+
+## ------------------------------------------------------------------------
+hgate_pheno(hg_output)
+hgate_rule(hg_output)
+hgate_info(hg_output)
+# Fscores can be retrieved when the same parameters given to hypergate() are given to hgate_info():
+hg_out_info = hgate_info(hg_output,
+	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels],
+	gate_vector=gate_vector,
+	level=1)
+hg_out_info
+# and formatted readily
+paste0(hg_out_info[,"Fscore"], collapse = ", ")
+
+## ------------------------------------------------------------------------
+set.seed(123) ## Makes the subsampling reproducible
+gate_vector=Samusik_01_subset$labels
+subsample=hgate_sample(gate_vector=gate_vector,level=5,size=100) ## Subsample 100 events from population #5 (Classical monocytes), and a corresponding number of negative events
+tab=table(ifelse(subsample,"In","Out"),ifelse(Samusik_01_subset$labels==5,"Positive pop.","Negative pop."))
+tab[1,]/colSums(tab) ## Fraction of subsampled events for positive and negative populations
+xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels]
+hg=hypergate(xp=xp[subsample,],gate_vector=gate_vector[subsample],level=5) ## Runs hypergate on a subsample of the input matrix
+gating_heldout=subset_matrix_hg(hg,xp[!subsample,]) ## Applies the gate to the held-out data
+table(ifelse(gating_heldout,"Gated in","Gated out"),ifelse(Samusik_01_subset$labels[!subsample]==5,"Positive pop.","Negative pop."))
 
