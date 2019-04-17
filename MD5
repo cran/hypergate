@@ -1,12 +1,12 @@
-9825a0c324d4f1be3acbf2792f2f3bf3 *DESCRIPTION
+5d9d45d2922a3f084e0f59850465e102 *DESCRIPTION
 c589bcd33822eef083838bdb29bc67ed *NAMESPACE
-26740edc2613d993bfe24b22991171e6 *R/hypergate.R
+f16ef54bc187c247c7fb13980fce6e81 *R/hypergate.R
 1e64037e3c33482c80b43c64950b2358 *README.md
-1039119b833eacd7d6ced19332438b30 *build/vignette.rds
+5d4d028283001f4935f3379f9209b3b6 *build/vignette.rds
 15e82d1f72d6487f38af33a890555674 *data/Samusik_01_subset.RData
 b97066fb207c292148286b546f1e344c *inst/doc/Hypergate.R
 062493417e19e3bcb079533d3c6ad519 *inst/doc/Hypergate.Rmd
-84c22ad86a75796a391cf4fca156acda *inst/doc/Hypergate.html
+2f8f313e1be498673298786ad3050bc0 *inst/doc/Hypergate.html
 445048662ed6580af20712117a598a9a *man/FNTN_matrix.recycle.Rd
 d8d9c08d32cbb87442310be6b9bb606a *man/F_beta.Rd
 67cd4f9149c510ac2b9b3e6930366a7f *man/Samusik_01_subset.Rd
