@@ -1,33 +1,33 @@
-## ----global_options, include=FALSE---------------------------------------
+## ----global_options, include=FALSE--------------------------------------------
 knitr::opts_chunk$set(fig.pos = 'H',tidy.opts=list(width.cutoff=60),tidy=TRUE,fig.path="fig/")
 
-## ---- include=FALSE------------------------------------------------------
+## ---- include=FALSE-----------------------------------------------------------
 options("warn"=-1)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  install.packages(c("sp","polyclip","rgeos"))
 #  source("https://bioconductor.org/biocLite.R")
 #  biocLite("flowCore")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  install.packages("devtools")
 #  library(devtools)
 #  install_github(repo="ebecht/hypergate")
 
-## ---- echo = TRUE, message = FALSE---------------------------------------
+## ---- echo = TRUE, message = FALSE--------------------------------------------
 library(hypergate)
 
-## ---- echo= TRUE---------------------------------------------------------
+## ---- echo= TRUE--------------------------------------------------------------
 data(Samusik_01_subset,package="hypergate")
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 #  g=gate_from_biplot(
 #  	Samusik_01_subset$tsne,
 #  	"tSNE1",
 #  	"tSNE2"
 #  )		
 
-## ---- echo=TRUE, fig.cap="Manual selection of a cluster on a 2D t-SNE"----
+## ---- echo=TRUE, fig.cap="Manual selection of a cluster on a 2D t-SNE"--------
 x=c(12.54,8.08,7.12,12.12,17.32,20.62,21.04,20.83,18.07,15.20)
 y=c(-10.61,-14.76,-18.55,-20.33,-21.16,-19.74,-14.40,-11.08,-10.02,-9.42)
 pol=list(x=x,y=y)
@@ -36,20 +36,20 @@ gate_vector=sp::point.in.polygon(Samusik_01_subset$tsne[,1],Samusik_01_subset$ts
 plot(Samusik_01_subset$tsne,pch=16,cex=0.5,col=ifelse(gate_vector==1,"firebrick3","lightsteelblue"))
 polygon(pol,lty=2)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  require(Rphenograph)
 #  set.seed(5881215)
 #  clustering=Rphenograph(Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels])
 #  cluster_labels=membership(clustering[[2]])
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(5881215)
 cluster_labels=kmeans(Samusik_01_subset$tsne,20,nstart=100)$cluster
 
-## ---- fig.cap="Selection of a cluster from a clustering algorithm output"----
+## ---- fig.cap="Selection of a cluster from a clustering algorithm output"-----
 plot(Samusik_01_subset$tsne,col=ifelse(cluster_labels==20,"firebrick3","lightsteelblue"),pch=16,cex=0.5)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 hg_output=hypergate(
 	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels],
 	gate_vector=gate_vector,
@@ -57,26 +57,26 @@ hg_output=hypergate(
 	verbose=FALSE
 )
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 gating_predicted=subset_matrix_hg(hg_output,Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels])
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  table(ifelse(gating_predicted,"Gated-in","Gated-out"),ifelse(gate_vector==1,"Events of interest","Others"))
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 knitr::kable(table(ifelse(gating_predicted,"Gated-in","Gated-out"),ifelse(gate_vector==1,"Events of interest","Others")))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 bm=boolmat(
 	gate=hg_output,
 	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels]
 )
 head(bm)
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 knitr::kable(table(ifelse(bm[,"SiglecF_min"],"SiglecF above threshold","Gated-out because of SiglecF"),ifelse(gate_vector==1,"Events of interest","Others")))
 
-## ----echo=TRUE,fig.width=3.5,fig.height=3.5,fig.cap="Gating strategy"----
+## ----echo=TRUE,fig.width=3.5,fig.height=3.5,fig.cap="Gating strategy"---------
 plot_gating_strategy(
 	gate=hg_output,
 	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels],
@@ -92,7 +92,7 @@ f_values_vs_number_of_parameters=c(
 )
 barplot(rev(f_values_vs_number_of_parameters),names.arg=rev(c("Initialization",paste("+ ",sep="",hg_output$active_channels))),las=3,mar=c(10,4,1,1),horiz=TRUE,xlab="Cumulative F1-score")
 
-## ---- fig.cap="Contribution of each parameter to the output"-------------
+## ---- fig.cap="Contribution of each parameter to the output"------------------
 contributions=channels_contributions(
 	gate=hg_output,
 	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels],
@@ -102,7 +102,7 @@ contributions=channels_contributions(
 )		
 barplot(contributions,las=3,mar=c(10,4,1,1),horiz=TRUE,xlab="F1-score deterioration when the parameter is ignored")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 hg_output_polished=reoptimize_strategy(
 	gate=hg_output,
 	channels_subset=c("SiglecF_min","cKit_max"),
@@ -111,7 +111,7 @@ hg_output_polished=reoptimize_strategy(
 	level=1
 )
 
-## ----echo=TRUE,fig.width=3.5,fig.height=3.5, fig.cap="Final output"------
+## ----echo=TRUE,fig.width=3.5,fig.height=3.5, fig.cap="Final output"-----------
 plot_gating_strategy(
 	gate=hg_output_polished,
 	xp=Samusik_01_subset$xp_src[,Samusik_01_subset$regular_channels],
@@ -120,7 +120,7 @@ plot_gating_strategy(
 	highlight="firebrick3"
 )
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 hgate_pheno(hg_output)
 hgate_rule(hg_output)
 hgate_info(hg_output)
@@ -133,7 +133,7 @@ hg_out_info
 # and formatted readily
 paste0(hg_out_info[,"Fscore"], collapse = ", ")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 set.seed(123) ## Makes the subsampling reproducible
 gate_vector=Samusik_01_subset$labels
 subsample=hgate_sample(gate_vector=gate_vector,level=5,size=100) ## Subsample 100 events from population #5 (Classical monocytes), and a corresponding number of negative events
